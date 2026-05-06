@@ -21,7 +21,7 @@ Ele faz parte do projeto maior **Sistema de Gestão de Biblioteca**, que é comp
 # 🛠 Tecnologias Utilizadas
 
 - Node.js  
-- Restify  
+- Fastify  
 - Prisma ORM  
 - Prisma Client v5 (`@prisma/client@5`)  
 - MySQL  
@@ -59,7 +59,7 @@ Este microserviço tem como responsabilidade:
 - `livro_sinopse`
 - `livro_numero_paginas`
 - `livro_idioma`
-- `livro_status`
+- `livro_status`(1 = ativo / 0 = inativo)
 
 ### 🔹 Autor
 
@@ -68,13 +68,14 @@ Este microserviço tem como responsabilidade:
 - `autor_data_nascimento`
 - `autor_nacionalidade`
 - `autor_biografia`
-- `autor_status`
+- `autor_status`(1 = ativo / 0 = inativo)
 
 ### 🔹 Gênero
 
 - `genero_id`
 - `genero_nome`
 - `genero_descricao`
+> ⚠️ A tabela gênero não possui campo de status.
 
 ### 🔹 Exemplar
 
@@ -82,6 +83,7 @@ Este microserviço tem como responsabilidade:
 - `exemplar_codigo_barras`
 - `exemplar_condicao`
 - `exemplar_status`
+  ('Disponivel','Emprestado','Manutencao','Perdido')
 - `exemplar_data_aquisicao`
 - `livro_id (FK)`
 
@@ -154,12 +156,28 @@ catalogo-livros/
 │   │   ├── generos.controller.js
 │   │   └── exemplares.controller.js
 │   │
+│   ├── services/
+│   │   ├── livros.service.js
+│   │   ├── autores.service.js
+│   │   ├── generos.service.js
+│   │   └── exemplares.service.js
+│   │
 │   └── server.js
 │
 ├── .env
 ├── package.json
 └── README.md
 ```
+
+---
+
+### 🧱 Arquitetura em Camadas
+Este projeto utiliza separação de responsabilidades:
+- **Rotas(Fastify)** → recebem requisições
+- **Controllers** → tratam request/response
+- **Services** → contêm regras de negócio
+- **Prisma CLient** → comunicação com o banco
+- **MySQL** → persistência dos dados
 
 ---
 
@@ -202,24 +220,25 @@ PORT=3000`
 # 🌐 Endpoints Principais
 
 ## 📘 Livros
-| Método | Rota          | Descrição             |
-| ------ | ------------- | --------------------- |
-| GET    | `/livros`     | Lista todos os livros |
-| GET    | `/livros/:id` | Busca livro por ID    |
-| POST   | `/livros`     | Cria novo livro       |
-| PUT    | `/livros/:id` | Atualiza livro        |
-| DELETE | `/livros/:id` | Remove livro          |
+| Método | Rota                                | Descrição             |
+| ------ | ----------------------------------- | --------------------- |
+| GET    | `/livros`                           | Lista todos os livros |
+| GET    | `/livros/:id`                       | Busca livro por ID    |
+| POST   | `/livros`                           | Cadastra novo livro   |
+| PUT    | `/livros/:id`                       | Atualiza dados        |
+| PATCH  | `/livros/:id/status`                | Altera status         |
+| POST   | `/livros/:livroId/autores/:autorId` | Vincula autor         |
 
 ---
 
 ## ✍️ Autores
-| Método | Rota           | Descrição                          |
-| ------ | -------------- | ---------------------------------- |
-| GET    | `/autores`     | Lista todos os autores cadastrados |
-| GET    | `/autores/:id` | Busca um autor específico pelo ID  |
-| POST   | `/autores`     | Cadastra um novo autor             |
-| PUT    | `/autores/:id` | Atualiza os dados de um autor      |
-| DELETE | `/autores/:id` | Remove um autor do sistema         |
+| Método | Rota                  | Descrição      |
+| ------ | --------------------- | -------------- |
+| GET    | `/autores`            | Lista todos    |
+| GET    | `/autores/:id`        | Busca por ID   |
+| POST   | `/autores`            | Cadastra autor |
+| PUT    | `/autores/:id` | Atualiza dados do autor |
+| PATCH  | `/autores/:id/status` | Altera status  |
 
 ---
 
@@ -230,7 +249,6 @@ PORT=3000`
 | GET    | `/generos/:id` | Busca um gênero específico pelo ID |
 | POST   | `/generos`     | Cadastra um novo gênero            |
 | PUT    | `/generos/:id` | Atualiza os dados de um gênero     |
-| DELETE | `/generos/:id` | Remove um gênero do sistema        |
 
 ---
 
@@ -241,16 +259,16 @@ PORT=3000`
 | GET    | `/exemplares/:id` | Busca um exemplar específico pelo ID           |
 | POST   | `/exemplares`     | Cadastra um novo exemplar vinculado a um livro |
 | PUT    | `/exemplares/:id` | Atualiza a condição ou status do exemplar      |
-| DELETE | `/exemplares/:id` | Remove um exemplar do sistema                  |
+| PATCH | `/exemplares/:id/status` | Remove um exemplar do sistema                  |
 
 ---
 
 # 🔁 Fluxo da Requisição
 1. Cliente envia requisição HTTP
-2. Restify recebe e executa plugins
-3. Rota chama o Controller
-4. Controller valida dados
-5. Prisma Client executa operação
+2. Fastify recebe e direciona para rota
+3. Controller trata requisição
+4. Service executa regra de negócio
+5. Prisma Client acessa banco
 6. MySQL responde
 7. API retorna resposta HTTP
 
@@ -259,18 +277,18 @@ PORT=3000`
 # 🧠 Conceitos Aplicados
 - Arquitetura em camadas
 - Separação de responsabilidades
-- ORM (Prisma)
-- Migrations controladas
+- Clean Code
+- ORM (Prisma v5)
 - Relacionamentos N:N
-- Tratamento de erros (ex: P2002)
-- Uso de variáveis de ambiente
+- Migrations controladas
+- Variáveis de ambiente
 
 ---
 
 # 🔐 Tratamento de Erros
-- `400` – Dados obrigatórios ausentes
+- `400` – Dados inválidos
 - `404` – Registro não encontrado
-- `409` – Conflito (ex: ISBN duplicado)
+- `409` – Conflito (ex: ISBN duplicado – erro P2002 do Prisma)
 - `500` – Erro interno do servidor
 
 ---
