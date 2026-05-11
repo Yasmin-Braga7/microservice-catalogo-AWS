@@ -3,10 +3,10 @@ const rabbitmq = require('./config/rabbitmq');
 fastify.register(require('./plugins/prisma'));
 
 
-fastify.register(require('./routes/livros'), { prefix: '/biblioteca/catalogo/livros' });
-fastify.register(require('./routes/exemplares'), { prefix: '/biblioteca/catalogo/exemplares' });
-fastify.register(require('./routes/autores'), { prefix: '/biblioteca/catalogo/autores' });
-fastify.register(require('./routes/generos'), { prefix: '/biblioteca/catalogo/generos' });
+fastify.register(require('./routes/livro'), { prefix: '/biblioteca/catalogo/livros' });
+fastify.register(require('./routes/exemplar'), { prefix: '/biblioteca/catalogo/exemplares' });
+fastify.register(require('./routes/autor'), { prefix: '/biblioteca/catalogo/autores' });
+fastify.register(require('./routes/genero'), { prefix: '/biblioteca/catalogo/generos' });
 
 const start = async () => {
     try {
