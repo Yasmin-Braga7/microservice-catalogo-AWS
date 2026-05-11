@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  catalogo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: biblioteca-catalogo
+    restart: unless-stopped
+
+    ports:
+      - "9502:9502" # Porta pública do microsserviço de Catálogo
+
+    environment:
+      PORT: 9502
+      NODE_ENV: production
+      # Banco de dados (Configure no .env do servidor)
+      DATABASE_URL: ${DATABASE_URL}
+      # RabbitMQ (servidor externo da faculdade)
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://admin:adminadmin@academico3.rj.senac.br:5672}
+      RABBITMQ_RECONNECT_DELAY: 5000
+
+    networks:
+      - biblioteca-net
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  biblioteca-net:
+    name: biblioteca-net
+    driver: bridge
