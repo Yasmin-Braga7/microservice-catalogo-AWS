@@ -17,7 +17,7 @@ services:
       # Banco de dados (Configure no .env do servidor)
       DATABASE_URL: ${DATABASE_URL}
       # RabbitMQ (servidor externo da faculdade)
-      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://admin:adminadmin@academico3.rj.senac.br:5672}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       RABBITMQ_RECONNECT_DELAY: 5000
 
     networks:
