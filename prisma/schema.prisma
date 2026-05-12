@@ -8,82 +8,76 @@ datasource db {
 }
 
 model Livro {
-  id            Int           @id @default(autoincrement()) @map("livro_id")
-  titulo        String        @map("livro_titulo") @db.VarChar(255)
-  isbn          String        @unique @map("livro_isbn") @db.VarChar(13)
-  editora       String?       @map("livro_editora") @db.VarChar(100)
-  anoPublicacao Int?          @map("livro_ano_publicacao")
-  sinopse       String?       @map("livro_sinopse") @db.VarChar(100)
-  numeroPaginas Int?          @map("livro_numero_paginas")
-  idioma        String?       @map("livro_idioma") @db.VarChar(50)
-  status        Int?          @default(1) @map("livro_status")
-
-  // Relacionamentos
-  autores       LivroAutor[]
-  generos       LivroGenero[]
+  id            Int          @id @default(autoincrement()) @map("livro_id")
+  titulo        String       @map("livro_titulo") @db.VarChar(255)
+  isbn          String       @unique(map: "livro_isbn") @map("livro_isbn") @db.VarChar(13)
+  editora       String?      @map("livro_editora") @db.VarChar(100)
+  anoPublicacao Int?         @map("livro_ano_publicacao")
+  sinopse       String?      @map("livro_sinopse") @db.VarChar(100)
+  numeroPaginas Int?         @map("livro_numero_paginas")
+  idioma        String?      @map("livro_idioma") @db.VarChar(50)
+  status        Int?         @map("livro_status")
   exemplares    Exemplar[]
+  autores       LivroAutor[]
 
   @@map("livro")
 }
 
 model Autor {
-  id             Int           @id @default(autoincrement()) @map("autor_id")
-  nome           String        @map("autor_nome") @db.VarChar(200)
-  dataNascimento DateTime?     @map("autor_data_nascimento") @db.Date
-  nacionalidade  String?       @map("autor_nacionalidade") @db.VarChar(100)
-  biografia      String?       @map("autor_biografia") @db.VarChar(100)
-  status         Int?          @default(1) @map("autor_status")
-
-  // Relacionamentos
+  id             Int          @id @default(autoincrement()) @map("autor_id")
+  nome           String       @map("autor_nome") @db.VarChar(200)
+  dataNascimento DateTime?    @map("autor_data_nascimento") @db.Date
+  nacionalidade  String?      @map("autor_nacionalidade") @db.VarChar(100)
+  biografia      String?      @map("autor_biografia") @db.VarChar(100)
+  status         Int?         @map("autor_status")
   livros         LivroAutor[]
 
   @@map("autor")
 }
 
 model Genero {
-  id        Int           @id @default(autoincrement()) @map("genero_id")
-  nome      String        @unique @map("genero_nome") @db.VarChar(100)
-  descricao String?       @map("genero_descricao") @db.VarChar(100)
-  status    Int?          @default(1) @map("genero_status") 
-
-  // Relacionamentos
-  livros    LivroGenero[]
+  id        Int     @id @default(autoincrement()) @map("genero_id")
+  nome      String  @unique(map: "genero_nome") @map("genero_nome") @db.VarChar(100)
+  descricao String? @map("genero_descricao") @db.VarChar(100)
 
   @@map("genero")
 }
 
 model LivroAutor {
-  id       Int   @id @default(autoincrement()) @map("livro_autor_id")
-  livroId  Int   @map("livro_id")
-  autorId  Int   @map("autor_id")
+  id      Int    @id @default(autoincrement()) @map("livro_autor_id")
+  livroId Int?   @map("livro_id")
+  autorId Int?   @map("autor_id")
+  livro   Livro? @relation(fields: [livroId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk1")
+  autor   Autor? @relation(fields: [autorId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk2")
 
-  livro    Livro @relation(fields: [livroId], references: [id])
-  autor    Autor @relation(fields: [autorId], references: [id])
-
+  @@index([autorId], map: "autor_id")
+  @@index([livroId], map: "livro_id")
   @@map("livro_autor")
 }
 
-model LivroGenero {
-  id       Int    @id @default(autoincrement()) @map("livro_genero_id")
-  livroId  Int    @map("livro_id")
-  generoId Int    @map("genero_id")
+model Exemplar {
+  id              Int                         @id @default(autoincrement()) @map("exemplar_id")
+  codigoBarras    String                      @unique(map: "exemplar_codigo_barras") @map("exemplar_codigo_barras") @db.VarChar(50)
+  condicao        exemplar_exemplar_condicao? @map("exemplar_condicao")
+  disponibilidade exemplar_exemplar_status?   @map("exemplar_status")
+  dataAquisicao   DateTime?                   @map("exemplar_data_aquisicao") @db.Date
+  livroId         Int                         @map("livro_id")
+  livro           Livro                       @relation(fields: [livroId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_exemplar_livro1")
 
-  livro    Livro  @relation(fields: [livroId], references: [id])
-  genero   Genero @relation(fields: [generoId], references: [id])
-
-  @@map("livro_genero")
+  @@index([livroId], map: "fk_exemplar_livro1_idx")
+  @@map("exemplar")
 }
 
-model Exemplar {
-  id              Int       @id @default(autoincrement()) @map("exemplar_id")
-  codigoBarras    String    @unique @map("exemplar_codigo_barras") @db.VarChar(50)
-  condicao        String?   @map("exemplar_condicao") // Novo, Bom, Regular, Desgastado
-  disponibilidade String?   @map("exemplar_status")   // Disponivel, Emprestado, Manutencao, Perdido
-  dataAquisicao   DateTime? @map("exemplar_data_aquisicao") @db.Date
-  status          Int?      @default(1) @map("exemplar_status_registro") 
-  livroId         Int       @map("livro_id")
+enum exemplar_exemplar_condicao {
+  Novo
+  Bom
+  Regular
+  Desgastado
+}
 
-  livro           Livro     @relation(fields: [livroId], references: [id])
-
-  @@map("exemplar")
+enum exemplar_exemplar_status {
+  Disponivel
+  Emprestado
+  Manutencao
+  Perdido
 }

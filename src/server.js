@@ -1,4 +1,5 @@
 const fastify = require('fastify')({ logger: true });
+require('dotenv').config();
 const rabbitmq = require('./config/rabbitmq');
 fastify.register(require('./plugins/prisma'));
 
