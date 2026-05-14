@@ -14,20 +14,13 @@ pipeline {
             }
         }
 
-        stage('Instalar Dependências') {
-            steps {
-                bat 'npm install'
-                bat 'npx prisma generate'
-            }
-        }
-
         stage('Fazer Deploy com Compose') {
             steps {
-                script {
-                    env.PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
-
-                    bat "docker compose up -d --build"
-                }
+                // Injeta os caminhos mais comuns do Docker no Windows e roda o compose
+                bat '''
+                set PATH=C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\Docker\\Docker\\client;%PATH%
+                docker compose up -d --build
+                '''
             }
         }
     }
