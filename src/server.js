@@ -7,6 +7,7 @@ const start = async () => {
     try {
         await carregarSenhasSeguras();
 
+        const rabbitmq = require('./config/rabbitmq');
         fastify.register(require('./plugins/prisma'));
 
         fastify.get('/health', async (request, reply) => {
