@@ -23,8 +23,6 @@ services:
       INFISICAL_CLIENT_SECRET: "427e0e366c7e0967c2fa6202feffe5894a4ae2d0d4ea9bea0872dd73e07f33ac"
       INFISICAL_PROJECT_ID: "7bd12571-769c-482c-81c7-c13a99bbce76"
 
-    networks:
-      - biblioteca-net
 
     logging:
       driver: "json-file"
