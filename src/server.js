@@ -14,10 +14,10 @@ const start = async () => {
             return { status: 'ok', servico: 'catalogo' };
         });
 
-        fastify.register(require('./routes/livro'), { prefix: '/biblioteca/catalogo/livros' });
-        fastify.register(require('./routes/exemplar'), { prefix: '/biblioteca/catalogo/exemplares' });
-        fastify.register(require('./routes/autor'), { prefix: '/biblioteca/catalogo/autores' });
-        fastify.register(require('./routes/genero'), { prefix: '/biblioteca/catalogo/generos' });
+        fastify.register(require('./routes/livro'), { prefix: '/livros' });
+        fastify.register(require('./routes/exemplar'), { prefix: '/exemplares' });
+        fastify.register(require('./routes/autor'), { prefix: '/autores' });
+        fastify.register(require('./routes/genero'), { prefix: '/generos' });
 
         await rabbitmq.connect();
 
