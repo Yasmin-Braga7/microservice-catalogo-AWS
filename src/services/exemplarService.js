@@ -26,8 +26,8 @@ async function adicionarExemplar(livroId, dados) {
     const novoExemplar = await prisma.exemplar.create({
         data: {
             codigoBarras: dados.codigoBarras,
-            condicao: dados.condicao || "NOVO",
-            disponibilidade: dados.statusDisponibilidade || "DISPONIVEL",
+            condicao: dados.condicao || "Novo",
+            disponibilidade: dados.statusDisponibilidade || "Disponivel",
             status: 1,
             dataAquisicao: new Date(dados.dataAquisicao),
             livro: { connect: { id: Number(livroId) } }
