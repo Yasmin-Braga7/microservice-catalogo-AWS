@@ -1,6 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const rabbitmq = require('../config/rabbitmq');
 const prisma = require('../config/prisma');
+const rabbitmq = require('../config/rabbitmq');
 
 async function listarLivros(filtros = {}) {
     const where = {};

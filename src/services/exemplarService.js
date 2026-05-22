@@ -1,4 +1,3 @@
-const { PrismaClient } = require('@prisma/client');
 const prisma = require('../config/prisma');
 const rabbitmq = require('../config/rabbitmq');
 
@@ -28,7 +27,6 @@ async function adicionarExemplar(livroId, dados) {
             codigoBarras: dados.codigoBarras,
             condicao: dados.condicao || "Novo",
             disponibilidade: dados.statusDisponibilidade || "Disponivel",
-            status: 1,
             dataAquisicao: new Date(dados.dataAquisicao),
             livro: { connect: { id: Number(livroId) } }
         }
@@ -47,19 +45,17 @@ async function alterarStatusExemplar(id, dadosAtualizacao) {
     const exemplarAtualizado = await prisma.exemplar.update({
         where: { id: Number(id) },
         data: {
-            status: dadosAtualizacao.status !== undefined ? Number(dadosAtualizacao.status) : undefined,
             condicao: dadosAtualizacao.condicao,
-            disponibilidade: dadosAtualizacao.disponibilidade // Ex: Emprestado, Disponível, Danificado
+            disponibilidade: dadosAtualizacao.disponibilidade
         }
     });
-
+ 
     await rabbitmq.publish(rabbitmq.EVENTS.EXEMPLAR_ALTERADO, {
         exemplarId: exemplarAtualizado.id,
-        status: exemplarAtualizado.status,
         condicao: exemplarAtualizado.condicao,
         disponibilidade: exemplarAtualizado.disponibilidade
     });
-
+ 
     return exemplarAtualizado;
 }
 
