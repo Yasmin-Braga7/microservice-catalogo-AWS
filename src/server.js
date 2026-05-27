@@ -10,6 +10,12 @@ const start = async () => {
         const rabbitmq = require('./config/rabbitmq');
         fastify.register(require('./plugins/prisma'));
 
+        fastify.register(require('@fastify/cors'), {
+            origin: '*', 
+            methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization']
+        });
+
         fastify.get('/health', async (request, reply) => {
             return { status: 'ok', servico: 'catalogo' };
         });

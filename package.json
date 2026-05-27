@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
     "@infisical/sdk": "^5.0.2",
     "@prisma/client": "^5.22.0",
     "amqplib": "^2.0.1",
