@@ -26,6 +26,7 @@ const start = async () => {
         fastify.register(require('./routes/genero'), { prefix: '/generos' });
 
         await rabbitmq.connect();
+        await rabbitmq.iniciarConsumidores();
 
         await fastify.listen({ port: 9502, host: '0.0.0.0' });
 
