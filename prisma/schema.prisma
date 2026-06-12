@@ -18,6 +18,9 @@ model Livro {
   numeroPaginas Int?          @map("livro_numero_paginas")
   idioma        String?       @map("livro_idioma") @db.VarChar(50)
   status        Int?          @map("livro_status")
+  imagem        Bytes?        @map("livro_imagem")
+  extensao      String?       @map("livro_extensao") @db.VarChar(10)
+  imagemNome    String?       @map("livro_imagem_nome") @db.VarChar(255)
   
   exemplares    Exemplar[]
   autores       LivroAutor[]

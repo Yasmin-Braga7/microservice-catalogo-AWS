@@ -10,6 +10,13 @@ const start = async () => {
         const rabbitmq = require('./config/rabbitmq');
         fastify.register(require('./plugins/prisma'));
 
+        fastify.register(require('@fastify/multipart'), {
+            limits: {
+                fileSize: 5 * 1024 * 1024, // 5 MB
+                files: 1,
+            },
+        });
+
         fastify.register(require('@fastify/cors'), {
             origin: '*', 
             methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
