@@ -13,7 +13,8 @@ async function listarLivros(filtros = {}) {
         // Atualizado para trazer os dados reais do Autor e Gênero através da tabela de ligação
         include: {
             autores: { include: { autor: true } },
-            generos: { include: { genero: true } }
+            generos: { include: { genero: true } },
+            _count: { select: { exemplares: true } }
         }
     });
 }

@@ -14,14 +14,13 @@ model Livro {
   isbn          String        @unique(map: "livro_isbn") @map("livro_isbn") @db.VarChar(13)
   editora       String?       @map("livro_editora") @db.VarChar(100)
   anoPublicacao Int?          @map("livro_ano_publicacao")
-  sinopse       String?       @map("livro_sinopse") @db.VarChar(100)
+  sinopse       String?       @map("livro_sinopse") @db.Text
   numeroPaginas Int?          @map("livro_numero_paginas")
   idioma        String?       @map("livro_idioma") @db.VarChar(50)
   status        Int?          @map("livro_status")
   imagem        Bytes?        @map("livro_imagem")
   extensao      String?       @map("livro_extensao") @db.VarChar(10)
   imagemNome    String?       @map("livro_imagem_nome") @db.VarChar(255)
-  
   exemplares    Exemplar[]
   autores       LivroAutor[]
   generos       LivroGenero[]
@@ -34,7 +33,7 @@ model Autor {
   nome           String       @map("autor_nome") @db.VarChar(200)
   dataNascimento DateTime?    @map("autor_data_nascimento") @db.Date
   nacionalidade  String?      @map("autor_nacionalidade") @db.VarChar(100)
-  biografia      String?      @map("autor_biografia") @db.VarChar(100)
+  biografia      String?      @map("autor_biografia") @db.Text
   status         Int?         @map("autor_status")
   livros         LivroAutor[]
 
@@ -42,11 +41,11 @@ model Autor {
 }
 
 model Genero {
-  id       Int           @id @default(autoincrement()) @map("genero_id")
-  nome     String        @unique(map: "genero_nome") @map("genero_nome") @db.VarChar(100)
-  descricao String?      @map("genero_descricao") @db.VarChar(100)
-  status   Int?          @map("genero_status")
-  livros   LivroGenero[]
+  id        Int           @id @default(autoincrement()) @map("genero_id")
+  nome      String        @unique(map: "genero_nome") @map("genero_nome") @db.VarChar(100)
+  descricao String?       @map("genero_descricao") @db.VarChar(500)
+  status    Int?          @map("genero_status")
+  livros    LivroGenero[]
 
   @@map("genero")
 }
