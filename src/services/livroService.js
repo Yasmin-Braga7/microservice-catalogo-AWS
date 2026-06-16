@@ -14,6 +14,7 @@ async function listarLivros(filtros = {}) {
         include: {
             autores: { include: { autor: true } },
             generos: { include: { genero: true } },
+            exemplares: true,
             _count: { select: { exemplares: true } }
         }
     });
@@ -92,4 +93,69 @@ async function alterarStatusLivro(id, status) {
     return livroAtualizado;
 }
 
-module.exports = { listarLivros, buscarLivroPorId, cadastrarLivro, alterarStatusLivro };
+async function editarLivro(id, dados) {
+    const autoresIds = dados.autores || [];
+    const generosIds = dados.generos || [];
+
+    const livroAtualizado = await prisma.$transaction(async (tx) => {
+        // 1. Atualiza os campos básicos do livro
+        await tx.livro.update({
+            where: { id: Number(id) },
+            data: {
+                titulo: dados.titulo,
+                isbn: dados.isbn,
+                editora: dados.editora,
+                anoPublicacao: dados.anoPublicacao,
+                sinopse: dados.sinopse,
+                numeroPaginas: dados.numeroPaginas,
+                idioma: dados.idioma,
+            },
+        });
+
+        // 2. Recria as associações de autores (deleta todas e insere as novas)
+        if (dados.autores !== undefined) {
+            await tx.livroAutor.deleteMany({ where: { livroId: Number(id) } });
+            if (autoresIds.length > 0) {
+                await tx.livroAutor.createMany({
+                    data: autoresIds.map((idAutor) => ({
+                        livroId: Number(id),
+                        autorId: idAutor,
+                    })),
+                });
+            }
+        }
+
+        // 3. Recria as associações de gêneros (deleta todas e insere as novas)
+        if (dados.generos !== undefined) {
+            await tx.livroGenero.deleteMany({ where: { livroId: Number(id) } });
+            if (generosIds.length > 0) {
+                await tx.livroGenero.createMany({
+                    data: generosIds.map((idGenero) => ({
+                        livroId: Number(id),
+                        generoId: idGenero,
+                    })),
+                });
+            }
+        }
+
+        // 4. Retorna o livro atualizado com includes
+        return tx.livro.findUnique({
+            where: { id: Number(id) },
+            include: {
+                autores: { include: { autor: true } },
+                generos: { include: { genero: true } },
+            },
+        });
+    });
+
+    // Emite evento para outros microsserviços
+    await rabbitmq.publish(rabbitmq.EVENTS.LIVRO_ALTERADO, {
+        livroId: livroAtualizado.id,
+        titulo: livroAtualizado.titulo,
+        isbn: livroAtualizado.isbn,
+    });
+
+    return livroAtualizado;
+}
+
+module.exports = { listarLivros, buscarLivroPorId, cadastrarLivro, alterarStatusLivro, editarLivro };

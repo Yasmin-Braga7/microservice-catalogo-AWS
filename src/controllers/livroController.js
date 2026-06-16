@@ -46,4 +46,23 @@ async function alterarStatus(request, reply) {
     }
 }
 
-module.exports = { listarLivros, buscarLivro, cadastrarLivro, alterarStatus };
+async function editarLivro(request, reply) {
+    try {
+        const { id } = request.params;
+        const livroAtualizado = await livroService.editarLivro(id, request.body);
+        if (!livroAtualizado) {
+            return reply.status(404).send({ erro: 'Livro não encontrado.' });
+        }
+        return reply.status(200).send(livroAtualizado);
+    } catch (error) {
+        if (error.code === 'P2002') {
+            return reply.status(409).send({ erro: 'O ISBN informado já se encontra registado.' });
+        }
+        if (error.code === 'P2025') {
+            return reply.status(404).send({ erro: 'Livro não encontrado.' });
+        }
+        return reply.status(500).send({ erro: 'Erro interno ao editar o livro.' });
+    }
+}
+
+module.exports = { listarLivros, buscarLivro, cadastrarLivro, alterarStatus, editarLivro };

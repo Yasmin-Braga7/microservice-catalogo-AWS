@@ -8,6 +8,10 @@ async function listarExemplares(filtros = {}) {
         where.disponibilidade = filtros.disponibilidade;
     }
 
+    if (filtros.livro_id !== undefined) {
+        where.livroId = Number(filtros.livro_id);
+    }
+
     return await prisma.exemplar.findMany({
         where,
         include: { livro: true }

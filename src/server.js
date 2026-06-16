@@ -28,6 +28,7 @@ const start = async () => {
         });
 
         fastify.register(require('./routes/livro'), { prefix: '/livros' });
+        fastify.register(require('./routes/upload'), { prefix: '/livros' });
         fastify.register(require('./routes/exemplar'), { prefix: '/exemplares' });
         fastify.register(require('./routes/autor'), { prefix: '/autores' });
         fastify.register(require('./routes/genero'), { prefix: '/generos' });
