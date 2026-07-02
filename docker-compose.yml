@@ -14,15 +14,16 @@ services:
     environment:
       PORT: 9502
       NODE_ENV: production
-      # # Banco de dados (Configure no .env do servidor)
-      # DATABASE_URL: ${DATABASE_URL}
-      # # RabbitMQ (servidor externo da faculdade)
-      # RABBITMQ_URL: ${RABBITMQ_URL}
+      # Banco de dados e RabbitMQ (valores vêm do .env local, não commitado)
+      DATABASE_URL: ${DATABASE_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       RABBITMQ_RECONNECT_DELAY: 5000
-      INFISICAL_CLIENT_ID: "28c50a6c-c408-4185-b846-2f3213d56035"
-      INFISICAL_CLIENT_SECRET: "427e0e366c7e0967c2fa6202feffe5894a4ae2d0d4ea9bea0872dd73e07f33ac"
-      INFISICAL_PROJECT_ID: "7bd12571-769c-482c-81c7-c13a99bbce76"
+      INFISICAL_CLIENT_ID: ${INFISICAL_CLIENT_ID}
+      INFISICAL_CLIENT_SECRET: ${INFISICAL_CLIENT_SECRET}
+      INFISICAL_PROJECT_ID: ${INFISICAL_PROJECT_ID}
 
+    env_file:
+      - .env
 
     logging:
       driver: "json-file"
