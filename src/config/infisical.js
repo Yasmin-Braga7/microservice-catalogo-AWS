@@ -22,14 +22,14 @@ async function carregarSenhasSeguras() {
         const dbSecret = await client.secrets().getSecret({
             environment: "dev",
             projectId: process.env.INFISICAL_PROJECT_ID,
-            path: "/",
+            secretPath: "/AWS",
             secretName: "DATABASE_URL"
         });
 
         const rabbitSecret = await client.secrets().getSecret({
             environment: "dev",
             projectId: process.env.INFISICAL_PROJECT_ID,
-            path: "/",
+            secretPath: "/AWS",
             secretName: "RABBITMQ_URL"
         });
 
