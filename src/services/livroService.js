@@ -10,8 +10,19 @@ async function listarLivros(filtros = {}) {
 
     return await prisma.livro.findMany({
         where,
-        // Atualizado para trazer os dados reais do Autor e Gênero através da tabela de ligação
-        include: {
+        select: {
+            id: true,
+            titulo: true,
+            isbn: true,
+            editora: true,
+            anoPublicacao: true,
+            sinopse: true,
+            numeroPaginas: true,
+            idioma: true,
+            status: true,
+            imagemNome: true,   // mantido: só o nome do arquivo, não os bytes
+            extensao: true,     // mantido: só a extensão, útil pro <img src>
+            // imagem: NÃO incluído de propósito — é o campo pesado
             autores: { include: { autor: true } },
             generos: { include: { genero: true } },
             exemplares: true,
